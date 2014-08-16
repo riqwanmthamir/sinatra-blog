@@ -1,0 +1,28 @@
+<div class="auth-form">
+
+	<% if flash[:signup] %>
+		<div class="alert alert-success" role="alert">
+			<p><%= flash[:signup] %></p>
+		</div>
+	<% end %>
+
+</div>
+
+<div class="container">
+	<div class="auth-form">
+		<form class="form-signin" action="/signup" method="post">
+		    <h2 class="form-signin-heading">Sign up</h2>
+		    <input type="text" name="username" class="fix form-control" placeholder="Username" required="" autofocus="">
+		    <input type="email" name="email" class="fix form-control" placeholder="Email ID" required="">
+		    
+		    <input type="password" name="password" class="form-control" placeholder="Password" required="">
+		    
+		    <div class="checkbox">
+		      <p>Existing user? <a href="/login">Sign in</a></p>
+		    </div>
+		    
+		    <button class="btn btn-lg btn-default btn-block" type="submit">Sign up</button>
+		</form>
+	</div>
+</div>
+

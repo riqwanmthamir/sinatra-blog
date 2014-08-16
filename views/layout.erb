@@ -1,0 +1,57 @@
+<% redirect '/' if !check_login? %>
+
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Germ Blog</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../css/style.css" rel="stylesheet">
+  </head>
+
+  <body cz-shortcut-listen="true">
+    
+    <div class="masthead clearfix">
+      <div class="inner">
+        <div class="container">
+          <a href="/"><h3 class="masthead-brand">Germ Blog</h3></a>
+          <ul class="nav masthead-nav drop">
+          <% if !check_login? %>
+            <li><a href="/login">Login</a></li>
+          <% else %>
+
+            <li><a>Hello <%= session[:username] %></a></li>
+            <li><a href="/posts/new">Add Post</a></li>
+            <li><a href="/logout">Logout</a></li>
+          <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+	    <div class="row">
+	    	<%= yield %> 
+	    </div>
+    </div>
+  
+    <div class="footer">
+      <div class="container">
+        <p class="text-muted">Created by Riqwan</p>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/blog.js"></script>
+</body></html>
+
+

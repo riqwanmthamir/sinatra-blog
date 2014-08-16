@@ -1,0 +1,51 @@
+<!-- Post Section -->
+
+<% if flash[:comment] %>
+	<div class="alert alert-success" role="alert">
+		<p><%= flash[:comment] %></p>
+	</div>
+<% end %>
+
+<h1><%= @post.title %></h1>
+
+<% if @post.author == @author %>
+	<span><a href="/edit/<%= @post.id %>"><img class="blog-icons" src="../img/edit.png"></a></span>
+	<span><a href="/posts/<%= @post.id %>/delete"><img class="blog-icons" src="../img/exit.png"></a></span>
+<% end %>
+
+<h5>Post by <%=@post.author%></h5>
+<p><%= @post.body %></p>
+
+<!-- End Post Section -->
+<hr><hr>
+<!-- Comments Section -->
+
+<h2>Comments</h2>
+  
+<ul class="list-unstyled">
+
+	<% if !@comment.nil? %>
+	<% user = get_user_object(@author) %>
+		<% @comment.each do |comment| %>
+		  <li>
+		    <h5>Post by <%=user.username%></h5>
+		    <p><%= comment.body %></p>
+		    
+		    <% if comment.user_id == user.id %>
+		    <a href="/<%= @post.id%>/<%= comment.id %>/delete">Delete</a>
+	    	<% end %>
+	    	<hr>
+		  </li>
+		<% end %>
+	<% end %>
+</ul> 
+
+
+<form action="/posts/<%= params[:id] %>/comment" method="post">
+  <label for="comm_body">Comment:</label><br />
+  <textarea class="form-textarea form-control" id="comm_body" name="comment[body]" rows="5" cols ="2"></textarea>
+  <br />
+  <input type="submit" class="btn btn-primary" value="Create Comment" />
+</form>   
+
+<!-- End Comments Section -->
