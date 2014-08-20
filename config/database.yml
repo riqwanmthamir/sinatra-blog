@@ -1,6 +1,6 @@
 adapter: mysql2 
-database: db
+database: blogs
 username: root
-password: pass
+password: Riqwan1!
 host: localhost
 port: 9999
