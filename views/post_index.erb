@@ -16,8 +16,8 @@
 	  <li class = "post-list col-md-4">
 	    <h2><a href="/post/<%= post.id %>"><%= post.title %></a></h2> 
 
-	    <% if post.user.username == get_current_username %>
-	    	<span><a href="/edit/<%= post.id %>"><img class="blog-icons" src="../img/edit.png"></a></span>
+	    <% if post.user.username == @user.username %>
+	    	<span><a href="/post/<%= post.id %>/edit"><img class="blog-icons" src="../img/edit.png"></a></span>
 	    <% end %>
 
 	    <h5>Post by <%=post.user.username%></h5>

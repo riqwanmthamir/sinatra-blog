@@ -28,8 +28,8 @@
             <li><a href="/login">Login</a></li>
           <% else %>
 
-            <li><a>Hello <%= session[:username] %></a></li>
-            <li><a href="/posts/new">Add Post</a></li>
+            <li><a>Hello <%= @user.username %></a></li>
+            <li><a href="/post/new">Add Post</a></li>
             <li><a href="/logout">Logout</a></li>
           <% end %>
           </ul>

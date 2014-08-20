@@ -16,8 +16,14 @@ class Blog < Sinatra::Base
   	enable :sessions
   	register Sinatra::Flash
 	
-	before %r{^(?!(/|/login|/signup|/confirm/([\w]+)|/space)$)} do
+	before %r{^(?!(/|/login|/signup|/activate/([\w]+)|/space)$)} do
         redirect '/' if !check_login?
+    end
+
+    before do
+    	if check_login?
+    		@user = get_user_object(:session_token, session[:id])
+    	end
     end
 
 	get "/" do 
@@ -31,7 +37,7 @@ class Blog < Sinatra::Base
 
  	# --------------------------- START USER ----------------------------- #
 
-    get "/confirm/:token" do
+    get "/activate/:token" do
 		if user = get_user_object(:activation_token, params[:token])
 			flash[:login] = "You're already Activated"
 			redirect '/login' if user.activated
@@ -74,43 +80,45 @@ class Blog < Sinatra::Base
 
  	# --------------------------- START POSTS ----------------------------- #
 
-	get '/posts/new' do
+	get '/post/new' do
 		erb :post_new
 	end
 
-	post "/posts" do
+	post "/post/new" do
 	    post = Post.new(params[:post])
-	    user = get_user_object(:session_token, session[:id])
-	    post.user = user
+	    post.user = @user
 	    if post.save
 	  		redirect "post/#{post.id}"
 	    else
 	    	erb :new
 	  	end
 	end
-
-	get '/edit/:id' do
-		@post = Post.find(params[:id])
-		erb :post_edit, :layout => :layout
-	end
   
 	get "/post/:id" do
-		@comment = Comment.all.where(post_id: params[:id])
-  		@post = Post.find(params[:id])
-  		@author = get_current_username
+		@comment = Comment.where(post_id: params[:id])
+  		@post = Post.where(id: params[:id]).first
   		erb :post_single
 	end
 
-	post "/posts/:id" do
-	    @post = Post.find(params[:id])
-	    if @post.update_attributes(params[:post])
-	    	redirect "/posts/#{@post.id}"
+	get '/post/:id/edit' do
+		@post = Post.where(id: params[:id]).first
+		if @post.user.username == @user.username
+			erb :post_edit
+		else
+			redirect "/post/#{params[:id]}"
+		end
+	end
+
+	post "/post/:id" do
+	    post = Post.where(id: params[:id]).first
+	    if post.update_attributes(params[:post])
+	    	redirect "/post/#{@post.id}"
 	    else
-	    	erb :edit_post
+	    	erb :post_edit
 	    end
 	end
 
-	get "/posts/:id/delete" do
+	get "/post/:id/delete" do
 		Comment.delete_all(post_id: params[:id])
 		Post.delete(params[:id])
 		flash[:post] = "Post deleted successfully."
@@ -122,11 +130,11 @@ class Blog < Sinatra::Base
  	# --------------------------- START COMMENTS ----------------------------- #
 
 	post "/post/:id/comment" do
-		user = get_user_object(:session_token, session[:id])
+		#user = get_user_object(:session_token, session[:id])
 		post = Post.where(id: params[:id]).first
 		comment = Comment.new(params[:comment])
 		comment.post = post
-		comment.user = user
+		comment.user = @user
 		if comment.save
 			flash[:comment] = "Comment created successfully."
 	  		redirect "/post/#{params[:id]}"
@@ -136,9 +144,9 @@ class Blog < Sinatra::Base
 	  	end
 	end
 
-	get "/:post_id/:id/delete" do
-		Comment.delete(params[:id])
-		@post_id = params[:post_id]
+	get "/post/:id/comment/:com_id/delete" do
+		Comment.delete(params[:com_id])
+		@post_id = params[:id]
 		flash[:comment] = "Comment deleted successfully."
 		redirect "/post/#{@post_id}"
 	end

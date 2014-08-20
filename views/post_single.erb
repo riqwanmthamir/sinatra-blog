@@ -8,9 +8,9 @@
 
 <h1><%= @post.title %></h1>
 
-<% if @post.user.username == @author %>
-	<span><a href="/edit/<%= @post.id %>"><img class="blog-icons" src="../img/edit.png"></a></span>
-	<span><a href="/posts/<%= @post.id %>/delete"><img class="blog-icons" src="../img/exit.png"></a></span>
+<% if @post.user.username == @user.username %>
+	<span><a href="/post/<%= @post.id %>/edit"><img class="blog-icons" src="../img/edit.png"></a></span>
+	<span><a href="/post/<%= @post.id %>/delete"><img class="blog-icons" src="../img/exit.png"></a></span>
 <% end %>
 
 <h5>Post by <%=@post.user.username%></h5>
@@ -30,7 +30,7 @@
 		    <h5>Post by <%=comment.user.username%></h5>
 		    <p><%= comment.body %></p>
 		    
-		    <% if comment.user.username == get_current_username %>
+		    <% if comment.user.username == @user.username %>
 		    <a href="/<%= @post.id%>/<%= comment.id %>/delete">Delete</a>
 	    	<% end %>
 	    	<hr>

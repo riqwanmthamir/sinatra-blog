@@ -24,11 +24,6 @@ module Functions
     return user.session_token
   end
 
-  def get_current_username
-    username = User.where(session_token: session[:id]).first.username
-    return username
-  end
-
   def create_user
     password_salt = BCrypt::Engine.generate_salt
     password_hash = BCrypt::Engine.hash_secret(params[:password], password_salt)
@@ -43,7 +38,7 @@ module Functions
     end
 
     if user = User.create(username: params[:username], email: params[:email], password_salt: password_salt, password_hash: password_hash, activated: false, activation_token: token)
-      Pony.mail(:to => "#{params[:email]}", :from => 'sidegeeks@gmail.com', :headers => { 'Content-Type' => 'text/html' }, :subject => 'Germ Blog Confirmation Mail', :body => "Click <a href='http://localhost:9292/confirm/#{token}'>here</a> to get <b>activated</b>")
+      Pony.mail(:to => "#{params[:email]}", :from => 'sidegeeks@gmail.com', :headers => { 'Content-Type' => 'text/html' }, :subject => 'Germ Blog Confirmation Mail', :body => "Click <a href='http://localhost:9292/activate/#{token}'>here</a> to get <b>activated</b>")
       flash[:signup] = "Success, an activation email has been sent"
       redirect "/login"
     else
