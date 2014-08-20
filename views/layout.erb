@@ -1,3 +1,4 @@
+<! -- REMOVEEEEEEEEEEEE -->
 <% redirect '/' if !check_login? %>
 
 <html lang="en"><head>
@@ -20,11 +21,12 @@
   <body cz-shortcut-listen="true">
     
     <div class="masthead clearfix">
+      <!-- <div class="flash"><%= flash[:message] %></div> -->
       <div class="inner">
         <div class="container">
           <a href="/"><h3 class="masthead-brand">Germ Blog</h3></a>
           <ul class="nav masthead-nav drop">
-          <% if !check_login? %>
+          <% unless current_user %>
             <li><a href="/login">Login</a></li>
           <% else %>
 

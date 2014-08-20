@@ -1,6 +1,8 @@
 module Functions
 
   def check_login?
+    # is the user session id exists AND there is a corresponding current_user
+    # then he is logged in
     if session[:id].nil?
       return false
     else
@@ -8,6 +10,24 @@ module Functions
     end
   end
 
+  # rename this method to current_user
+  # def current_user
+  #   This method will return back the current user object
+  #   you do not need to have sperate is he logged in or
+  #   logged out methods, all you need to do is
+  #
+  #   @user ||= get_user_object(:session_token, session[:id])
+  #
+  #   if current_user
+  #     then assume he is logged in
+  #   else
+  #     then no one is logged in
+  #   end
+  # end
+  
+  # ::2:: please remove this method and just use 
+  # regular AR finders
+  # i.e User.where(...)
   def get_user_object(column, value)
     user = User.where(column => value).first
     return user
@@ -27,7 +47,6 @@ module Functions
   def create_user
     password_salt = BCrypt::Engine.generate_salt
     password_hash = BCrypt::Engine.hash_secret(params[:password], password_salt)
-    token = SecureRandom.hex
 
     if User.where(username: params[:username]).first
       flash[:signup] = "Sorry, that username already exists"
@@ -38,7 +57,7 @@ module Functions
     end
 
     if user = User.create(username: params[:username], email: params[:email], password_salt: password_salt, password_hash: password_hash, activated: false, activation_token: token)
-      Pony.mail(:to => "#{params[:email]}", :from => 'sidegeeks@gmail.com', :headers => { 'Content-Type' => 'text/html' }, :subject => 'Germ Blog Confirmation Mail', :body => "Click <a href='http://localhost:9292/activate/#{token}'>here</a> to get <b>activated</b>")
+      user.send_activation_email
       flash[:signup] = "Success, an activation email has been sent"
       redirect "/login"
     else
@@ -71,5 +90,4 @@ module Functions
       redirect "/login"
     end
   end
-
 end

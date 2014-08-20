@@ -9,6 +9,7 @@
 	</div>
 <% end %>
 
+<!-- no business login inside the view layer -->
 <% if check_login? %>
 
 	<ul class="list-unstyled">
@@ -16,10 +17,12 @@
 	  <li class = "post-list col-md-4">
 	    <h2><a href="/post/<%= post.id %>"><%= post.title %></a></h2> 
 
+      <!-- embrace the ID in you, trust it :P -->
 	    <% if post.user.username == @user.username %>
 	    	<span><a href="/post/<%= post.id %>/edit"><img class="blog-icons" src="../img/edit.png"></a></span>
 	    <% end %>
 
+      <!-- is it user_name or username? -->
 	    <h5>Post by <%=post.user.username%></h5>
 	    <p><%= post.body %></p>
 	  </li>
