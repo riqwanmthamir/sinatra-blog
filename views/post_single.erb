@@ -8,12 +8,12 @@
 
 <h1><%= @post.title %></h1>
 
-<% if @post.author == @author %>
+<% if @post.user.username == @author %>
 	<span><a href="/edit/<%= @post.id %>"><img class="blog-icons" src="../img/edit.png"></a></span>
 	<span><a href="/posts/<%= @post.id %>/delete"><img class="blog-icons" src="../img/exit.png"></a></span>
 <% end %>
 
-<h5>Post by <%=@post.author%></h5>
+<h5>Post by <%=@post.user.username%></h5>
 <p><%= @post.body %></p>
 
 <!-- End Post Section -->
@@ -25,13 +25,12 @@
 <ul class="list-unstyled">
 
 	<% if !@comment.nil? %>
-	<% user = get_user_object(@author) %>
 		<% @comment.each do |comment| %>
 		  <li>
-		    <h5>Post by <%=user.username%></h5>
+		    <h5>Post by <%=comment.user.username%></h5>
 		    <p><%= comment.body %></p>
 		    
-		    <% if comment.user_id == user.id %>
+		    <% if comment.user.username == get_current_username %>
 		    <a href="/<%= @post.id%>/<%= comment.id %>/delete">Delete</a>
 	    	<% end %>
 	    	<hr>
@@ -41,7 +40,7 @@
 </ul> 
 
 
-<form action="/posts/<%= params[:id] %>/comment" method="post">
+<form action="/post/<%= params[:id] %>/comment" method="post">
   <label for="comm_body">Comment:</label><br />
   <textarea class="form-textarea form-control" id="comm_body" name="comment[body]" rows="5" cols ="2"></textarea>
   <br />

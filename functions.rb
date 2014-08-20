@@ -8,7 +8,28 @@ module Functions
     end
   end
 
-  def create_user(params)
+  def get_user_object(column, value)
+    user = User.where(column => value).first
+    return user
+  end
+
+  def create_session_token(user)
+    session_token = SecureRandom.uuid
+    user.update_attributes(session_token: session_token)
+    return session_token
+  end
+
+  def get_session_token(column, value)
+    user = User.where(column => value).first
+    return user.session_token
+  end
+
+  def get_current_username
+    username = User.where(session_token: session[:id]).first.username
+    return username
+  end
+
+  def create_user
     password_salt = BCrypt::Engine.generate_salt
     password_hash = BCrypt::Engine.hash_secret(params[:password], password_salt)
     token = SecureRandom.hex
