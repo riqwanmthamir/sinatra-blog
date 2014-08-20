@@ -109,7 +109,7 @@ class Blog < Sinatra::Base
 		end
 	end
 
-	post "/post/:id" do
+	post "/post/:id/edit" do
 	    post = Post.where(id: params[:id]).first
 	    if post.update_attributes(params[:post])
 	    	redirect "/post/#{@post.id}"

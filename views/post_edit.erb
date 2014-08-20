@@ -1,6 +1,6 @@
 
 <h1>Edit Post</h1>
-<form action="/posts/<%= @post.id %>" method="post">
+<form action="/posts/<%= @post.id %>/edit" method="post">
   <label for="post_title">Title:</label><br />
   <input id="post_title" name="post[title]" type="text" class="form-title form-control" value="<%= @post.title %>" />
   <br />

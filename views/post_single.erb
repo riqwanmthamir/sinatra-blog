@@ -31,7 +31,7 @@
 		    <p><%= comment.body %></p>
 		    
 		    <% if comment.user.username == @user.username %>
-		    <a href="/<%= @post.id%>/<%= comment.id %>/delete">Delete</a>
+		    <a href="/post/<%= @post.id%>/comment/<%= comment.id %>/delete">Delete</a>
 	    	<% end %>
 	    	<hr>
 		  </li>
