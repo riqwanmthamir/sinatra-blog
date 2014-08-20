@@ -11,19 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140814040343) do
+ActiveRecord::Schema.define(version: 20140819182914) do
 
   create_table "comments", force: true do |t|
-    t.text    "body"
-    t.integer "user_id"
-    t.integer "post_id"
+    t.integer  "user_id"
+    t.integer  "post_id"
+    t.text     "body"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "posts", force: true do |t|
+    t.integer  "user_id"
     t.string   "title"
     t.text     "body"
     t.string   "author"
     t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "users", force: true do |t|
@@ -31,8 +35,9 @@ ActiveRecord::Schema.define(version: 20140814040343) do
     t.string  "email"
     t.string  "password_salt"
     t.string  "password_hash"
-    t.boolean "activated",     default: false
-    t.string  "token"
+    t.string  "activation_token"
+    t.string  "session_token"
+    t.boolean "activated",        default: false
   end
 
 end
