@@ -1,16 +1,13 @@
-<!-- Post Section -->
+	<h1><%= @post.title %></h1>
 
-<% if flash[:comment] %>
-	<div class="alert alert-success" role="alert">
-		<p><%= flash[:comment] %></p>
-	</div>
-<% end %>
-
-<h1><%= @post.title %></h1>
-
-<% if @post.user.username == @user.username %>
+<% if @post.user.username == current_user.username %>
+	
+	<form class="delete-form "action="/post/<%= @post.id %>" method="post">
+  		<input type="hidden" name="_method" value="delete" /> 
+  		<input type="submit" value="" class="delete" />
+	</form>
 	<span><a href="/post/<%= @post.id %>/edit"><img class="blog-icons" src="../img/edit.png"></a></span>
-	<span><a href="/post/<%= @post.id %>/delete"><img class="blog-icons" src="../img/exit.png"></a></span>
+
 <% end %>
 
 <h5>Post by <%=@post.user.username%></h5>
@@ -24,14 +21,18 @@
   
 <ul class="list-unstyled">
 
-	<% if !@comment.nil? %>
-		<% @comment.each do |comment| %>
+	<% if !@post.comments.nil? %>
+		<% @post.comments.each do |comment| %>
 		  <li>
 		    <h5>Post by <%=comment.user.username%></h5>
 		    <p><%= comment.body %></p>
-		    
-		    <% if comment.user.username == @user.username %>
-		    <a href="/post/<%= @post.id%>/comment/<%= comment.id %>/delete">Delete</a>
+		    <% if comment.user.id == current_user.id %>
+		    	
+				<form action="/post/<%= @post.id %>/comment/<%= comment.id %>" method="post">
+			  		<input type="hidden" name="_method" value="delete" /> 
+			  		<input type="submit" value="" class="delete" />
+				</form>
+
 	    	<% end %>
 	    	<hr>
 		  </li>
@@ -40,7 +41,7 @@
 </ul> 
 
 
-<form action="/post/<%= params[:id] %>/comment" method="post">
+<form action="/post/<%= @post.id %>/comment" method="post">
   <label for="comm_body">Comment:</label><br />
   <textarea class="form-textarea form-control" id="comm_body" name="comment[body]" rows="5" cols ="2"></textarea>
   <br />

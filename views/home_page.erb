@@ -32,12 +32,7 @@
             </div>
           </div>
 
-          <% if flash[:home] %>
-            <div class="alert alert-success" role="alert">
-              <p><%= flash[:home] %></p>
-            </div>
-          <% end %>
-
+          <%= partial :flash %>
           <div class="inner cover">
             <h1 class="cover-heading">Give your ideas the steroid it needs!</h1>
             <hr>

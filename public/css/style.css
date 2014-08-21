@@ -56,6 +56,21 @@ a:hover {
   background: #bf360c;
 }
 
+
+.delete {
+  display: block;
+  border: none;
+  background-image: url(/img/exit.png);
+  max-height: 18px;
+  width: 18px;
+  background-size: 18px;
+  background-color: transparent;
+}
+
+.delete-form {
+  float: left;
+}
+
 /*
  * Header
  */

@@ -1,29 +1,17 @@
-<!-- <div class="container">
-	<h2>Germ</h2>
-	<p>A cult of ideas</p>
-</div> -->
 
-<% if flash[:post] %>
-	<div class="alert alert-success" role="alert">
-		<p><%= flash[:post] %></p>
-	</div>
+
+<ul class="list-unstyled">
+<% @posts.each do |post| %>
+  <li class = "post-list col-md-4">
+    <h2><a href="/post/<%= post.id %>"><%= post.title %></a></h2> 
+
+    <% if post.user.id == current_user.id %>
+    	<span><a href="/post/<%= post.id %>/edit"><img class="blog-icons" src="../img/edit.png"></a></span>
+    <% end %>
+
+    <h5>Post by <%=post.user.username%></h5>
+    <p><%= post.body %></p>
+  </li>
 <% end %>
+</ul> 
 
-<% if check_login? %>
-
-	<ul class="list-unstyled">
-	<% @posts.each do |post| %>
-	  <li class = "post-list col-md-4">
-	    <h2><a href="/post/<%= post.id %>"><%= post.title %></a></h2> 
-
-	    <% if post.user.username == @user.username %>
-	    	<span><a href="/post/<%= post.id %>/edit"><img class="blog-icons" src="../img/edit.png"></a></span>
-	    <% end %>
-
-	    <h5>Post by <%=post.user.username%></h5>
-	    <p><%= post.body %></p>
-	  </li>
-	<% end %>
-	</ul> 
-
-<% end %>
