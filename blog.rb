@@ -113,6 +113,14 @@ class Blog < Sinatra::Base
 		# returns the salt and password hash to encrypt
 		password_hash, password_salt = generate_password_hash_and_salt(params[:password])
 
+	    if User.where(username: params[:username]).first
+	      flash[:error] = "Sorry, that username already exists"
+	      redirect '/signup'
+	    elsif User.where(email: params[:email]).first
+	      flash[:error] = "Sorry, that email already exists"
+	      redirect '/signup'
+	    end
+
 	    activation_token = SecureRandom.hex
 
 	    if user = User.create(
