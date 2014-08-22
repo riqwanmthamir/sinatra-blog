@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+	validates :username, uniqueness: true
+	validates :email, uniqueness: true
 	has_many :posts
 	has_many :comments
 
@@ -16,7 +18,9 @@ class User < ActiveRecord::Base
 end
 
 class Post < ActiveRecord::Base
-	has_many :comments
+	default_scope { order(created_at: :desc)  }
+
+	has_many :comments, dependent: :destroy
 	belongs_to :user      
 end
 
