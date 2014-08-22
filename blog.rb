@@ -35,6 +35,9 @@ class Blog < Sinatra::Base
     # Home page if not logged in.
 	get "/" do 
 		if current_user
+      # Don't need to make this change but
+      # AR will allow you to specify a default order
+      # inside the model
 			@posts = Post.order("created_at DESC") 
 			erb :post_index
 		else
@@ -45,6 +48,7 @@ class Blog < Sinatra::Base
  	# --------------------------- START USER ----------------------------- #
 
  	# User visits this url from email to activate account after signup
+  # why is there a "?"
     get "/activate/:token/?" do
 		if user = User.where(activation_token: params[:token]).first
 			
@@ -113,9 +117,11 @@ class Blog < Sinatra::Base
 		# returns the salt and password hash to encrypt
 		password_hash, password_salt = generate_password_hash_and_salt 
 
+      # use AR validates uniqueness
 	    if User.where(username: params[:username]).first
 	      flash[:error] = "Sorry, that username already exists"
 	      redirect '/signup'
+      # use AR validates uniqueness
 	    elsif User.where(email: params[:email]).first
 	      flash[:error] = "Sorry, that email already exists"
 	      redirect '/signup'
@@ -153,6 +159,7 @@ class Blog < Sinatra::Base
 
 	# Updating new post attributes to database
 	post "/post/?" do
+      # why havn't you built the post with current_user ?
 	    post = Post.new(params[:post])
 	    post.user = current_user
 	    if post.save
@@ -175,12 +182,16 @@ class Blog < Sinatra::Base
 		if @post.user.id == current_user.id
 			erb :post_edit
 		else
+      # you are not current user ? seriously ? :-D
 			flash[:error] = "You are not the current user."
 			redirect "/post/#{params[:id]}"
 		end
 	end
 
 	# Altering the post attributes in the database 
+  #
+  # buddy, you NEED to protect the update too ... please ?
+  # anybody can still wipe out, by shooting a put request
 	put "/post/:id" do |id|
 		@post = Post.where(id: id).first
 	    if @post.update_attributes(params[:post])
@@ -192,6 +203,9 @@ class Blog < Sinatra::Base
 
 	# Deleting the Post and all of its comments from the database
 	delete "/post/:id" do |id|
+    # please check out active_record dependent destroy, implement it
+    # All finder methods are deprecated in the latest version of rails
+    # please use "where"
 		current_user.posts.find(id).comments.destroy_all
 		current_user.posts.find(id).destroy
 		flash[:message] = "Post deleted successfully."
@@ -219,6 +233,10 @@ class Blog < Sinatra::Base
 
 	# Deleting a comment from the post from the view & database
 	delete "/post/:post_id/comment/:comment_id" do |post_id, comment_id|
+    # All finder methods are deprecated in the latest version of rails
+    # please use "where"
+    # Yea, method chaining is fun right ? but they are very hard to read
+    # good rule of thumb is not more than 3 chains, generally!
 		current_user.posts.find(post_id).comments.find(comment_id).destroy
 		flash[:message] = "Comment deleted successfully."
 		redirect "/post/#{post_id}"
