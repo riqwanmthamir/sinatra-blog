@@ -128,9 +128,8 @@ class Blog < Sinatra::Base
 	      	flash[:message] = "Success, an activation email has been sent"
 	      	redirect '/signup'
 	    else
-	    	errors = user.errors.full_messages
-	    	flash[:errors] = errors
-	    	redirect '/signup'
+	    	@errors = user.errors.full_messages
+	    	erb :signup, layout: :signlog
 	    end
 	end
 
