@@ -1,8 +1,13 @@
 class User < ActiveRecord::Base
-	validates :username, uniqueness: true
-	validates :email, uniqueness: true
+	validates :username, :uniqueness => {:case_sensitive => false, :message => "Username already exists!"}
+	validates :email, :uniqueness => {:case_sensitive => false, :message => "Email already exists!"}
 	has_many :posts
 	has_many :comments
+
+	def a_method_used_for_validation_purposes
+    	errors.add(:username, "already taken, try another one.")
+    	errors.add(:email, "already in use")
+  	end
 
 	def send_activation_email
 		
