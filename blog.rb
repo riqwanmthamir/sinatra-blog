@@ -22,12 +22,12 @@ class Blog < Sinatra::Base
 
   	# This check allows visitors who haven't logged in to view only
   	# login,signup, activate and homepage. 
-	before %r{^(?!(/|/login|/signup|/activate/([\w]+))$)} do
+	before %r{^(?!(/|/login/?|/signup/?|/activate/([\w]+)/?)$)} do
         redirect '/' unless current_user
     end
 
     # Prevents logged in users from viewing login and signup page.
-    before %r{(login|signup)$} do
+    before %r{(login/?|signup/?)$} do
     	redirect '/' if current_user
     end
 
@@ -35,7 +35,7 @@ class Blog < Sinatra::Base
     # Home page if not logged in.
 	get "/" do 
 		if current_user
-			@posts = Post.order("created_at DESC") 
+			@posts = Post.all
 			erb :post_index
 		else
 			erb :home_page, :layout => false
@@ -111,19 +111,10 @@ class Blog < Sinatra::Base
 	post "/signup" do
 
 		# returns the salt and password hash to encrypt
-		password_hash, password_salt = generate_password_hash_and_salt 
-
-	    if User.where(username: params[:username]).first
-	      flash[:error] = "Sorry, that username already exists"
-	      redirect '/signup'
-	    elsif User.where(email: params[:email]).first
-	      flash[:error] = "Sorry, that email already exists"
-	      redirect '/signup'
-	    end
-
+		password_hash, password_salt = generate_password_hash_and_salt(params[:password])
 	    activation_token = SecureRandom.hex
 
-	    if user = User.create(
+	    user = User.new(
 		      username: params[:username], 
 		      email: params[:email], 
 		      password_salt: password_salt, 
@@ -131,14 +122,14 @@ class Blog < Sinatra::Base
 		      activated: false, 
 		      activation_token: activation_token
 	      )
-	    
-	      user.send_activation_email
 
-	      flash[:message] = "Success, an activation email has been sent"
-	      redirect "/login"
+	    if user.save
+	      	user.send_activation_email
+	      	flash[:message] = "Success, an activation email has been sent"
+	      	redirect '/signup'
 	    else
-	      flash[:error] = "There is some error with the database."
-	      redirect "/signup"
+	    	@errors = user.errors.full_messages
+	    	erb :signup, layout: :signlog
 	    end
 	end
 
@@ -147,15 +138,14 @@ class Blog < Sinatra::Base
  	# --------------------------- START POSTS ----------------------------- #
 
  	# Creating a new post
-	get '/post/new' do
+	get '/post/new/?' do
 		erb :post_new
 	end
 
 	# Updating new post attributes to database
 	post "/post/?" do
-	    post = Post.new(params[:post])
-	    post.user = current_user
-	    if post.save
+		post = current_user.posts.create(params[:post])
+	    if post
 	  		redirect "post/#{post.id}"
 	    else
 	    	erb :new
@@ -164,25 +154,25 @@ class Blog < Sinatra::Base
 
 	# Viewing the contents of the post (including comments) as a blog post.
 	# Also allows you to post comment.
-	get "/post/:id" do
-		@post = Post.where(id: params[:id]).first
+	get "/post/:id/?" do |id|
+		@post = Post.where(id: id).first
   		erb :post_single
 	end
 
 	# Editing a post
-	get '/post/:id/edit' do
-		@post = Post.where(id: params[:id]).first
+	get '/post/:id/edit/?' do |id|
+		@post = current_user.posts.where(id: id).first
 		if @post.user.id == current_user.id
 			erb :post_edit
 		else
-			flash[:error] = "You are not the current user."
+			flash[:error] = "You do not have privileges to edit this post"
 			redirect "/post/#{params[:id]}"
 		end
 	end
 
 	# Altering the post attributes in the database 
 	put "/post/:id" do |id|
-		@post = Post.where(id: id).first
+		@post = current_user.posts.where(id: id).first
 	    if @post.update_attributes(params[:post])
 	    	redirect "/post/#{@post.id}"
 	    else
@@ -192,8 +182,8 @@ class Blog < Sinatra::Base
 
 	# Deleting the Post and all of its comments from the database
 	delete "/post/:id" do |id|
-		current_user.posts.find(id).comments.destroy_all
-		current_user.posts.find(id).destroy
+		post = current_user.posts.where(id: id).first
+		post.destroy
 		flash[:message] = "Post deleted successfully."
 		redirect '/'
 	end
@@ -203,8 +193,9 @@ class Blog < Sinatra::Base
  	# --------------------------- START COMMENTS ----------------------------- #
 
  	# Updating the comment attributes into the database of post(id) from post_single page
-	post "/post/:id/comment" do
-		post = Post.where(id: params[:id]).first
+	post "/post/:id/comment" do |id|
+
+		post = Post.where(id: id).first
 		comment = post.comments.build(params[:comment])
 		comment.user = current_user
 
@@ -219,9 +210,17 @@ class Blog < Sinatra::Base
 
 	# Deleting a comment from the post from the view & database
 	delete "/post/:post_id/comment/:comment_id" do |post_id, comment_id|
-		current_user.posts.find(post_id).comments.find(comment_id).destroy
-		flash[:message] = "Comment deleted successfully."
-		redirect "/post/#{post_id}"
+
+		post = Post.where(id: post_id).first
+		comment = post.comments.where(id: comment_id).first
+		if comment.user_id == current_user.id
+			comment.destroy
+			flash[:message] = "Comment deleted successfully."
+			redirect "/post/#{post_id}"
+		else
+			flash[:error] = "You do not have permission to delete this comment"
+			redirect "/post/#{post_id}"
+		end
 	end
 
  	# --------------------------- END COMMENTS ----------------------------- #
