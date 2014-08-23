@@ -112,7 +112,6 @@ class Blog < Sinatra::Base
 
 		# returns the salt and password hash to encrypt
 		password_hash, password_salt = generate_password_hash_and_salt(params[:password])
-
 	    activation_token = SecureRandom.hex
 
 	    user = User.new(
@@ -127,16 +126,11 @@ class Blog < Sinatra::Base
 	    if user.save
 	      	user.send_activation_email
 	      	flash[:message] = "Success, an activation email has been sent"
-	      	redirect "/signup"
-	    elsif user.errors.messages[:username] && user.errors.messages[:email]
-	    	flash[:error] = "Username & Email already exists."
-	      	redirect "/signup"
-	    elsif user.errors.messages[:username]
-	    	flash[:error] = "Username already exists"
-	    	redirect "/signup"
+	      	redirect '/signup'
 	    else
-	    	flash[:error] = "Email already exists"
-	    	redirect "/signup"
+	    	errors = user.errors.full_messages
+	    	flash[:errors] = errors
+	    	redirect '/signup'
 	    end
 	end
 
